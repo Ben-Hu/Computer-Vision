@@ -24,14 +24,15 @@ filterOffset = (numRowsFilt - 1) / 2;
 paddedImg = padarray(img,[filterOffset filterOffset]);
 
 % Convolution
-for imgRow = 2:numRowsImg+1 %Rows of zero-padded 2:original image
-        for imgCol = 2:numColsImg+1 %Columns of zero-padded 2:original image
+for imgRow = 1+filterOffset:numRowsImg+filterOffset %Rows of zero-padded
+        for imgCol = 1+filterOffset:numColsImg+filterOffset
             % Convolution on pixel paddedImg[imgCol,imgRow] 
             areaToFilter = ...
                 (paddedImg(imgCol-filterOffset:imgCol+filterOffset, ...
                 imgRow-filterOffset:imgRow+filterOffset));
             % Sum element-wise mult of areaToFilter and filt
-            outImg(imgCol-1,imgRow-1) = sum(sum(areaToFilter.*filt,1),2);
+            outImg(imgCol-filterOffset,imgRow-filterOffset) = ...
+                sum(sum(areaToFilter.*filt,1),2);
         end
 end
 
