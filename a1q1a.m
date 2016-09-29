@@ -23,9 +23,9 @@ filt=flipud(fliplr(filt));
 filterOffset = (numRowsFilt - 1) / 2;
 paddedImg = padarray(img,[filterOffset filterOffset]);
 
-% Convolution
-for imgRow = 1+filterOffset:numRowsImg+filterOffset %Rows of zero-padded
-        for imgCol = 1+filterOffset:numColsImg+filterOffset
+% Convolution, start and end with filter origin on bounds of original image
+for imgRow = 1+filterOffset:numRowsImg+filterOffset 
+        for imgCol = 1+filterOffset:numColsImg+filterOffset 
             % Convolution on pixel paddedImg[imgCol,imgRow] 
             areaToFilter = ...
                 (paddedImg(imgCol-filterOffset:imgCol+filterOffset, ...
