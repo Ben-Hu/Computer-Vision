@@ -1,4 +1,5 @@
 clear all;close all;
+%fix this, should not have x and y sepcified, generated x and y as 2-3 * sigma (sufficient support)
 x = 11;
 y = 11;
 sig_x = 1;
