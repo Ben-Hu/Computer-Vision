@@ -1,8 +1,9 @@
-%Q3b
 function out = findWaldo(im, filter)
 % returns the output of normalized cross-correlation between image im and
 % filter 
 % by Sanja Fidler, UofT
+% Modified to perform normalized cross-correlation between the magnitude
+% of the gradients of image im and filter filter
 
 % convert image (and filter) to grayscale
 im_input = im;
