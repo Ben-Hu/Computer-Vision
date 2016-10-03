@@ -1,3 +1,4 @@
+clear all;close all;
 function out = findWaldo(im, filter)
 % returns the output of normalized cross-correlation between image im and
 % filter 
