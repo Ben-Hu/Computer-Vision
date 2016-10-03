@@ -1,3 +1,10 @@
+function filterSize = computeFilterSizeFromSigma(sigma)
+
+filterSize = 2*ceil(2*sigma) + 1;
+
+end
+
+m = images.internal.createGaussianKernel([15,2],[61,61])
 
 hRow =
 
