@@ -1,4 +1,4 @@
-clear all;;
+clear all;close all;
 noiseTemplate = (double(imread('templateNoise.png'))/255);
 waldoNoise = (double(imread('waldoNoise.png'))/255);
 
