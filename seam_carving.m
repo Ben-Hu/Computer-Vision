@@ -1,6 +1,7 @@
 %%Compute magnitude of the gradients of the image
 clear all; close all;
-img = double(imread('cameraman.tif'));
+img = double(imread('emoji.png'))/255;
+img = rgb2gray(img);
 % sub-sample I for now for ease of computation
 %img = img(100:150,100:150);
 %img = img(1:4,1:4);
