@@ -3,7 +3,7 @@ clear all; close all;
 img = double(imread('cameraman.tif'));
 % sub-sample I for now for ease of computation
 %img = img(100:150,100:150);
-img = img(1:4,1:4);
+%img = img(1:4,1:4);
 % smooth img
 img = imgaussfilt(img, 1);
 img_siz = size(img);
@@ -26,9 +26,6 @@ end
 % reshape magnitude of gradients to original image dimensions
 gradMag = reshape(gradMag, [img_siz(1),img_siz(2)]);
 %figure; imagesc(gradMag);axis image;colormap gray;
-
-%if j-1 = 0 
-%or j+1 > img_siz(2)
 
 % create a graph with source S and sink T
 % for each node n1 and n2, edge weight(n1, n2) = the pixel value of n2. 
@@ -130,20 +127,38 @@ for first_row_node=1:img_siz(2)
     g3 = addedge(g3,pixind_l,sink,0);
 end
 
-figure;
-plot(g3);
+%figure;
+%plot(g3);
 
 %find least cost path from source to sink 
 %equal to the lowest gradient energy from top to bottom of image
 %this is for 'vertical' seams
 %flip the image to do 'horizontal' seams
 
-s = shortestpath(g3,source,sink);
+s_path = shortestpath(g3,source,sink);
+%do not try to remove source/sink
+s_path = s_path(2:end-1);
 
 %change image into a vector and delete the nodes in the shortest path from
 %the vector, then reshape into the original image dimension, would
 %probably have been better to treat the image as a vector from the start.
 
+%reshape transpose of img and turn it into a vector so the indices
+%of the vector line up with the pixelIndices of the nodes
+%for value v in s_path, remove index v from this image vector
+
+new_img = reshape(img.',1,[]);
+num_to_remove = length(s_path);
+for i=1:num_to_remove
+    %remove pixel s_path(i) from new_img
+    %offset the index in s_path as the indexes of new_img change as we
+    %remove pixels
+    offset = i-1;
+    pixel = s_path(i);
+    new_img(pixel-offset) = [];
+end
+
+figure; imagesc(new_img);axis image;colormap gray;
 
 
 
