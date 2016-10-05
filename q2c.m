@@ -33,6 +33,7 @@ end
 
 %generate an anisotropic gaussian kernel for given sigma_x and sigma_y of
 function [myAnisoGauss] = genAnisoGauss(sig_x, sig_y)
+% Use same filter size as matlab does based on the sigmas
 x = 2*ceil(2*sig_x) + 1
 y = 2*ceil(2*sig_y) + 1
 xOffset = (x-1)/2;
@@ -42,7 +43,6 @@ yOffset = (y-1)/2;
 %yCoord = matrix w/ y values wrt the origin, upsidedown [-1,-1,-1;0,0,0;1,1,1]
 [xCoord,yCoord] = meshgrid(-yOffset:yOffset,-xOffset:xOffset);
 
-%pre-allocate myAnisoGauss
 myAnisoGauss = zeros(x,y);
 
 for xIter = 1:x
@@ -54,6 +54,8 @@ for xIter = 1:x
         myAnisoGauss(xIter,yIter) = res;      
     end
 end
+
+%Normalize
 myAnisoGauss = myAnisoGauss/sum(myAnisoGauss(:));
 
 end
