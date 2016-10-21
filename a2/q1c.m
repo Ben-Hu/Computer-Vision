@@ -1,12 +1,9 @@
 clear all;%close all;
+%% Question 1 c)
 img = double(imread('synthetic.png'));
 img = double(imread('building.jpg'))/255;
 img = rgb2gray(img);
 
-% img = zeros(256,256);
-% img(100:125,100:125)=1;
-
-%% Q1c
 imgS = conv2(img,fspecial('Gaussian',[25 25],0.5),'same');%Base smoothing
 clear responseLoG
 
