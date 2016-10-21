@@ -129,8 +129,9 @@ title('book keypoints');
 
 %construct P [xi,yi,0,0,1,0;0,0,x_i,y_i,0,1] from a
 %P = zeros(length(a_keys)*2,6);
+k = 3
 P = [];
-for i=1:3%length(a_keys)
+for i=1:k%length(a_keys)
     %build P with the x and y points from a (book)
     x_a = a_keys(1,i);
     y_a = a_keys(2,i);
@@ -141,13 +142,15 @@ end
 
 %construct column vector P' [xi;yi] from b
 P_prime = [] 
-for i=1:3%length(b_keys)
+for i=1:k%length(b_keys)
     x_b = b_keys(1,i); 
     y_b = b_keys(2,i);
     P_prime = cat(1,P_prime,x_b);
     P_prime = cat(1,P_prime,y_b);
 end
 
-%Compute the affine transformation matrix now based on P and P_prime
-%^T, ^-1
+%Compute the affine transformation matrix based on P and P_prime
+% [a;b;c;d;e;f]
 a = inv(P' * P) * P' * P_prime;
+
+
