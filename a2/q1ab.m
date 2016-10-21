@@ -6,9 +6,6 @@ img = rgb2gray(img);
 figure; imagesc(img);axis image;colormap gray;
 
 %Function for Harris corner metric using harmonic mean
-%Cornerness metric output
-%use builtins for convolution,gradients but compute M
-%adjust a to get a good result 
 
 % baseline smoothing of the original image 
 img = imgaussfilt(img,2.0);
@@ -32,7 +29,6 @@ Iy = gy .* gy;
 Ixy = gx .* gy;
 
 % Use same window function as MATLAB implementation
-%w = fspecial('gaussian',[5 1],1.5);
 w = fspecial('gaussian',[5 1],2.0);
 window = w * w';
 
@@ -47,42 +43,37 @@ R = zeros(img_siz(1), img_siz(2));
 
 for i=1:img_siz(1)
     for j=1:img_siz(2)
-        M_ij = [Ix(i,j), Ixy(i,j); Ixy(i,j), Iy(i,j)];
-        %Not using Brown Harmonic Mean, using Harris and Stevens R value
-        sens_val = 0.04;
-        R(i,j) = det(M_ij) - sens_val * trace(M_ij) .^ 2;
-        % Harmonic Mean
+        M_ij = [Ix(i,j), Ixy(i,j); Ixy(i,j), Iy(i,j)]; 
+        %Harris and Stevens
+        %sens_val = 0.04;       
+        %R(i,j) = det(M_ij) - sens_val * trace(M_ij) .^ 2;
+        % Brown Harmonic Mean
         R(i,j) = det(M_ij)/trace(M_ij);
     end
 end
 
-figure; imagesc(R); axis image; colormap gray;
+%figure; imagesc(R); axis image; colormap gray;
 
-% Compare with builtin cornerness metric calculations
-%cornernessB = cornermetric(mean(img,3)); 
-
-%figure; imagesc(cornernessB); axis image; colormap gray;
 R(isnan(R))=0;
 cornerness = R;
-% Playing around with ordfilt 2 to do non-maxima suppression
-% Using a square element, should use a circular at end
 
 
-%% Q1b
+%% Question 1 b)
 % use a disk filter and find position of maximum element based on numel
 % Larger radius for disk = larger area to filter
 % e.g. Only 1 max within the area of the disk, the smaller the radius
 % the more points we keep, the larger, the more points we discard
 
 element = fspecial('disk',3)>0; %> 0 makes elems logicals
+%Using imdilate morphological operator instead of ordfilt2
 %supp = ordfilt2(cornerness, numel(find(element)), element);
+%Get max values in disk area greater than the threshold in the original
+%image
 supp = imdilate(cornerness, element);
-%figure; imagesc(supp); axis image; colormap gray;
 threshold = 0.0002;
 corners = (cornerness==supp)&(supp>threshold); 
 
 fig = cat(3, corners, zeros(size(img,1), size(img,2)));
 fig = cat(3, fig, img);
-
 figure; imagesc(fig); axis image; colormap gray;
 
