@@ -1,11 +1,10 @@
 clear all; %close all;
 %% Question 1 a)
+%Harris corner metric using harmonic mean
 img = double(imread('synthetic.png'));
 img = double(imread('building.jpg'))/255;
 img = rgb2gray(img);
 figure; imagesc(img);axis image;colormap gray;
-
-%Function for Harris corner metric using harmonic mean
 
 % baseline smoothing of the original image 
 img = imgaussfilt(img,2.0);
@@ -56,7 +55,6 @@ end
 
 R(isnan(R))=0;
 cornerness = R;
-
 
 %% Question 1 b)
 % use a disk filter and find position of maximum element based on numel
