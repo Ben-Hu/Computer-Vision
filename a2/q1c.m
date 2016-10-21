@@ -95,7 +95,12 @@ interestPoints = sumMax; + sumMin;
 figure; imagesc(interestPoints); title('interest points'); colormap gray;
 
 %overlay the points over the original image
-overlay = cat(3, img, interestPoints);
-overlay = cat(3, overlay, interestPoints);
-figure; imagesc(overlay); title('overlay');
+overlay = cat(3, interestPoints, zeros(size(img,1),size(img,2)));
+overlay = cat(3, overlay, img);
+
+%overlay = cat(3, interestPoints + img, img);
+%overlay = cat(3, overlay, img);
+
+%overlay = img + interestPoints;
+figure; imagesc(overlay); title('overlay'); axis image; colormap gray;
 
