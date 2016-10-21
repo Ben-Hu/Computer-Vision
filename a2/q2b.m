@@ -33,7 +33,7 @@ h3 = vl_plotsiftdescriptor(descB(:,sel),keypointsB(:,sel)) ;
 set(h3,'color','g') ;
 
 %vlfeat matching
-[matches, scores] = vl_ubcmatch(descA, descB) ;
+[vl_matches, vl_scores] = vl_ubcmatch(descA, descB) ;
 
 % find euclidean distance between every match pair
 % sort the matches and compare the closest match to the second
@@ -75,7 +75,9 @@ end
 %match if reliability ratio between the closest and second closest is less
 %less than a threshold
 
-rel_threshold = 0.8;
+%vl_feat ubc matching seems to have higher threshold than 0.8 or even
+%it gets 117 matches whereas a 0.8 threshold gets 71
+rel_threshold = 0.95;
 reliability_ratios = closest ./ sec_close;
 closest_descriptors = find(reliability_ratios < rel_threshold);
 %descB(:,closest_ind(closest_descriptor(i))) matches with
@@ -95,12 +97,29 @@ findBook = rgb2gray(findBook);
 
 highlights = zeros(size(findBook,1),size(findBook,2));
 for i=1:size(matches,1)
-    x = round(keypointsB(1,matches(i,2)));
-    y = round(keypointsB(2,matches(i,2)));
+    y = round(keypointsB(1,matches(i,2)));
+    x = round(keypointsB(2,matches(i,2)));
     highlights(x,y) = 1;
 end
 
 figure; imagesc(highlights); axis image; colormap gray;
+title('findbook keypoints');
+
+overlay = cat(3, highlights, findBook);
+overlay = cat(3, overlay, findBook);
+figure; imagesc(overlay);
+
+book = single(imread('book.jpg'))/255;
+book = rgb2gray(book);
+
+highlights2 = zeros(size(book,1),size(book,2));
+for i=1:size(matches,1)
+    y = round(keypointsA(1,matches(i,1)));
+    x = round(keypointsA(2,matches(i,1)));
+    highlights2(x,y) = 1;
+end
+
+figure; imagesc(highlights2); axis image; colormap gray;
 title('book keypoints');
 
 
