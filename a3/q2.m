@@ -9,6 +9,11 @@
 % distances will be the distance between the railway tracks
 % Lecture 10
 
+%P^-1 * [x,y] = [x,y,z]
+
+
+
+
 %% Q2b
 %y = 95 
 %extrinsic
