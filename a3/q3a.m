@@ -1,8 +1,8 @@
 %% Assignment 3 Q3A
 %% Use vlfeat SIFT implementation to find features and matches
 clear all; close all;
-imgA = single(imread('book.jpg'))/255;
-imgB= single(imread('findBook.jpg'))/255;
+%imgA = single(imread('book.jpg'))/255;
+%imgB= single(imread('findBook.jpg'))/255;
 imgA = single(imread('c1.png'))/255;
 imgB= single(imread('c2.png'))/255;
 imgA = rgb2gray(imgA);
@@ -163,23 +163,26 @@ for i=1:size(imgA,1)
         XA(new_x,new_y) = imgA(i,j);
     end
 end
+
 figure; imagesc(imgA);axis image; colormap gray;hold on
-title('A');
+title('imgA');
 figure; imagesc(imgB);axis image; colormap gray;hold on
-title('B');
-
-%Plot the trasnformation as parallelogram over the image
-bl_corner = round(best_am*[0;0;1]);
-br_corner = round(best_am*[0;387;1]);
-tl_corner = round(best_am*[395;0;1]);
-tr_corner = round(best_am*[395;387;1]);
-
+title('imgB');
 figure; imagesc(XA);axis image; colormap gray;hold on
+title('RANSAC Transform');
+
+%Plot the trasnformation as parallelogram over the target image
+bl_corner = round(best_am*[0;0;1]);
+br_corner = round(best_am*[0;size(imgA,1);1]);
+tl_corner = round(best_am*[size(imgA,2);0;1]);
+tr_corner = round(best_am*[size(imgA,2);size(imgA,1);1]);
+
+figure; imagesc(imgB);axis image; colormap gray;hold on
 line([bl_corner(2),tl_corner(2)],[bl_corner(1),tl_corner(1)]);
 line([bl_corner(2),br_corner(2)],[bl_corner(1),br_corner(1)]);
 line([tr_corner(2),br_corner(2)],[tr_corner(1),br_corner(1)]);
 line([tr_corner(2),tl_corner(2)],[tr_corner(1),tl_corner(1)]);
-title('RANSAC Transform');
+title('Parallelogram Overlay');
 
 %Reference transform from Moore-Penrose lease squares from by A2 code.
 t_am = [0.0597929162403003,1.04042462070958,511.473935250196;,-1.04304742306299,-0.132837054877354,1484.35163183366]
