@@ -153,7 +153,7 @@ for i=1:S
     
 end
  
-%Visualize the best fit we found, transform imgB -> imgA
+%% Visualize the best fit we found, transform imgB -> imgA
 XA = zeros(size(imgB,1),size(imgB,2));
 for i=1:size(imgA,1)
     for j=1:size(imgA,2)
