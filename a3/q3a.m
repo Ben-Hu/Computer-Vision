@@ -14,7 +14,7 @@ imgB = conv2(imgB,fspecial('Gaussian',[25 25],0.5),'same');
 
 %Visualize sift features as is in the vlfeat vl_sift tutorial
 figure; imagesc(imgA); axis image; colormap gray;
-title('book');
+title('imgA');
 [keypointsA,descA] = vl_sift(imgA);
 perm = randperm(size(keypointsA,2)) ;
 sel = perm(1:20) ;
@@ -26,7 +26,7 @@ h3 = vl_plotsiftdescriptor(descA(:,sel),keypointsA(:,sel)) ;
 set(h3,'color','g') ;
 
 figure; imagesc(imgB); axis image; colormap gray;
-title('findBook');
+title('imgB');
 [keypointsB,descB] = vl_sift(imgB);
 perm = randperm(size(keypointsB,2)) ;
 sel = perm(1:20) ;
