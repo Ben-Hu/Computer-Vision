@@ -1,4 +1,4 @@
-%% Assignment 3 Q3
+%% Assignment 3 Q3A
 %% Use vlfeat SIFT implementation to find features and matches
 clear all; close all;
 imgA = single(imread('book.jpg'))/255;
