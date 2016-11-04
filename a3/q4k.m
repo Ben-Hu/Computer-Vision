@@ -77,7 +77,7 @@ for k=1:size(img,3)-1
     % iteration values, getting really consistent and good results with 
     % top k estimation
 
-    top_k = 16;
+    top_k = 8;
     A = [];
     for i=1:top_k
         matchi = vl_matchesk(:,i);    
@@ -114,36 +114,38 @@ figure; imagesc(XA);axis image; colormap gray;hold on
 title('Transformed imgA');
 
 %% Plot transformed imgA points onto imgB, should do for 1-7 plotting over 2-8
-p = 1; %for p=1:size(img,3)-1
-eval(sprintf('vl_matchesp = vl_matches%d;', p));
-eval(sprintf('vl_scoresp = vl_scores%d;', p));
-eval(sprintf('keypointsAp = keypoints%d;',p));
-eval(sprintf('keypointsBp = keypoints%d;',p+1));
+%p = 1; 
+for p=1:size(img,3)-1
+    eval(sprintf('vl_matchesp = vl_matches%d;', p));
+    eval(sprintf('vl_scoresp = vl_scores%d;', p));
+    eval(sprintf('keypointsAp = keypoints%d;',p));
+    eval(sprintf('keypointsBp = keypoints%d;',p+1));
 
-xy = zeros(2,top_k);
-matches = zeros(2,top_k);
-pnts = zeros(3,top_k);
-for q=1:top_k 
-    matches(:,q) = vl_matchesp(:,q);
-    xy(:,q) = [keypointsAp(2,matches(2,q)),keypointsAp(1,matches(1,q))];
-    pnts(:,q) = homographies(:,:,p) * [xy(:,q);1];
-    pnts(1,q) = max(1,pnts(1,q)/pnts(3,q));
-    pnts(2,q) = max(1,pnts(2,q)/pnts(3,q));
-end
+    xy = zeros(2,top_k);
+    matches = zeros(2,top_k);
+    pnts = zeros(3,top_k);
+    for q=1:top_k 
+        matches(:,q) = vl_matchesp(:,q);
+        xy(:,q) = [keypointsAp(2,matches(2,q)),keypointsAp(1,matches(1,q))];
+        pnts(:,q) = homographies(:,:,p) * [xy(:,q);1];
+        pnts(1,q) = max(1,pnts(1,q)/pnts(3,q));
+        pnts(2,q) = max(1,pnts(2,q)/pnts(3,q));
+    end
 
-figure; imagesc(img(:,:,p));axis image; colormap gray;hold on
-for q=1:top_k
-    plot(xy(2,q),xy(1,q),'r.','MarkerSize',20);
-end
-hold off;
-title('imgA(top k points)');
+    figure; imagesc(img(:,:,p));axis image; colormap gray;hold on
+    for q=1:top_k
+        plot(xy(2,q),xy(1,q),'r.','MarkerSize',20);
+    end
+    hold off;
+    title('imgA(top k points)');
 
-figure; imagesc(img(:,:,p+1));axis image; colormap gray;hold on
-for q=1:top_k
-    plot(pnts(2,q),pnts(1,q),'r.','MarkerSize',20);
+    figure; imagesc(img(:,:,p+1));axis image; colormap gray;hold on
+    for q=1:top_k
+        plot(pnts(2,q),pnts(1,q),'r.','MarkerSize',20);
+    end
+    hold off;
+    title('imgB(xformed points)');
 end
-hold off;
-title('imgB(xformed points)');
 
 % figure; imagesc(img(:,:,2)); axis image; colormap gray;
 % title('imgA');
