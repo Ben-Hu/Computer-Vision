@@ -52,6 +52,11 @@ end
 % visualize: transform keypoints from one image onto the next, diff color.
 
 homographies = zeros(3,3,size(img,3)-1);
+pmatches = zeros(7,4);
+
+min_dist = 99999 * ones(1,7);
+max_dist = zeros(1,7);
+max_inliers = zeros(1,7);
 
 for k=1:size(img,3)-1
    
@@ -65,21 +70,22 @@ for k=1:size(img,3)-1
 
     % Number of Iterations
     PS = 0.99;
-    pkS = 0.2^4;
+    pkS = 0.17^4;
     S = round(log(1-PS)/log(1-pkS));
 
     % Inlier threshold (euclidean distance between tranformed point and actual
     % match x,y
-    T = 300;
-
+    %T = 100;
+    T = [100,400,300,400,200,300,100];
+    
     num_matches = size(vl_matches,2);
 
     % debuggina and best fits
-    max_inliers = 0;
+    max_inliers(:,k) = 0;
     best_hm = [];
     best_matches = [];
-    min_dist = 9999;
-    max_dist = 0;
+    min_dist(:,k) = 99999;
+    max_dist(:,k) = 0;
     
     for i=1:S
         % Pick 4 random matches
@@ -164,24 +170,24 @@ for k=1:size(img,3)-1
             dist = pdist(X, 'euclidean');
 
             % For purposes of tuning T
-            if dist < min_dist
-                min_dist = dist;
+            if dist < min_dist(:,k)
+                min_dist(:,k) = dist;
             end
-            if dist > max_dist && max_dist ~= inf
-                max_dist = dist;
+            if dist > max_dist(:,k) && dist ~= inf
+                max_dist(:,k) = dist;
             end
 
             % Thresholding based on the euclidean distance calculation
-            if dist <= T
+            if dist <= T(:,k)
                 num_inliers = num_inliers + 1;
             end
             
         end
 
         %Check if this model is currently the best and keep it if it is
-        if num_inliers >= max_inliers 
+        if num_inliers >= max_inliers(:,k) 
             best_hm = hm;
-            max_inliers = num_inliers;
+            max_inliers(:,k) = num_inliers;
             best_matches = random_indices;
         end
 
@@ -189,7 +195,7 @@ for k=1:size(img,3)-1
     
     % Keep the best homography for this image pair, i/i+1
     homographies(:,:,k) = best_hm;
-
+    pmatches(k,:) = best_matches;
 end
 
 
@@ -201,7 +207,27 @@ title('RANSAC Transform');
 
 figure; imagesc(img(:,:,1));axis image; colormap gray;hold on
 title('imgA');
+
+%% Plot transformed imgA points onto imgB, should do for 1-7 plotting over 2-8
+match1 = vl_matches(:,pmatches(1,1));
+match2 = vl_matches(:,pmatches(1,2));
+match3 = vl_matches(:,pmatches(1,3));
+match4 = vl_matches(:,pmatches(1,4));
+
+xy1 = [keypointsA(2,match1(1));keypointsA(1,match1(1));1]
+pt1 = homographies(:,:,1) * xy1;
+xy2 = [keypointsA(2,match2(1));keypointsA(1,match2(1));1]
+pt2 = homographies(:,:,1) * xy2;
+xy3 = [keypointsA(2,match3(1));keypointsA(1,match3(1));1]
+pt3 = homographies(:,:,1) * xy3;
+xy4 = [keypointsA(2,match4(1));keypointsA(1,match4(1));1]
+pt4 = homographies(:,:,1) * xy4;
+
 figure; imagesc(img(:,:,2));axis image; colormap gray;hold on
+plot(pt1(1),pt1(2),'r.','MarkerSize',20)
+plot(pt2(1),pt2(2),'b.','MarkerSize',20)
+plot(pt3(1),pt3(2),'g.','MarkerSize',20)
+plot(pt4(1),pt4(2),'w.','MarkerSize',20)
 title('imgB');
 
 
