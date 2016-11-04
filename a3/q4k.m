@@ -64,7 +64,6 @@ end
 % visualize: transform keypoints from one image onto the next, diff color.
 
 homographies = zeros(3,3,size(img,3)-1);
-%pmatches = zeros(7,4);
 
 for k=1:size(img,3)-1  
     %Workaround for dynamic variables in matlab
@@ -74,8 +73,9 @@ for k=1:size(img,3)-1
     eval(sprintf('keypointsBk = keypoints%d;',k+1));
 
     % ***USE TOP k ordered by squared euclidean disnace
-    % Inconsistent results with RANSAC, poor runtime performance with
-    % higher iterations
+    % Inconsistent and poor results with RANSAC even with higher S
+    % iteration values, getting really consistent and good results with 
+    % top k estimation
 
     top_k = 16;
     A = [];
@@ -95,6 +95,7 @@ for k=1:size(img,3)-1
     [eigvec,eigval] = eig(At);
     eigval = sum(eigval,1);
     [min_eigval,min_eigval_ind]= min(eigval);
+    
     %eigenvector corresponding to the minimum eigenvalue 1x9
     min_eigvec = eigvec(:,min_eigval_ind);
 
@@ -103,7 +104,6 @@ for k=1:size(img,3)-1
     
     % Keep the best homography for this image pair, i/i+1
     homographies(:,:,k) = best_hm;
-    %pmatches(k,:) = best_matches;
 end
 
 
@@ -114,7 +114,7 @@ figure; imagesc(XA);axis image; colormap gray;hold on
 title('Transformed imgA');
 
 %% Plot transformed imgA points onto imgB, should do for 1-7 plotting over 2-8
-p = 1;
+p = 1; %for p=1:size(img,3)-1
 eval(sprintf('vl_matchesp = vl_matches%d;', p));
 eval(sprintf('vl_scoresp = vl_scores%d;', p));
 eval(sprintf('keypointsAp = keypoints%d;',p));
@@ -131,14 +131,14 @@ for q=1:top_k
     pnts(2,q) = max(1,pnts(2,q)/pnts(3,q));
 end
 
-figure; imagesc(img(:,:,1));axis image; colormap gray;hold on
+figure; imagesc(img(:,:,p));axis image; colormap gray;hold on
 for q=1:top_k
     plot(xy(2,q),xy(1,q),'r.','MarkerSize',20);
 end
 hold off;
 title('imgA(top k points)');
 
-figure; imagesc(img(:,:,2));axis image; colormap gray;hold on
+figure; imagesc(img(:,:,p+1));axis image; colormap gray;hold on
 for q=1:top_k
     plot(pnts(2,q),pnts(1,q),'r.','MarkerSize',20);
 end
