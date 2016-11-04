@@ -37,14 +37,26 @@ end
 %vl_scores  = squared euclidean distance between matches
 
 %Find feature correspondence between adjacent component images 
-[vl_matches1, vl_scores1] = vl_ubcmatch(desc1, desc2, 2.5);
-[vl_matches2, vl_scores2] = vl_ubcmatch(desc2, desc3, 2.5);
-[vl_matches3, vl_scores3] = vl_ubcmatch(desc3, desc4, 2.5);
-[vl_matches4, vl_scores4] = vl_ubcmatch(desc4, desc5, 2.5);
-[vl_matches5, vl_scores5] = vl_ubcmatch(desc5, desc6, 2.5);
-[vl_matches6, vl_scores6] = vl_ubcmatch(desc6, desc7, 2.5);
-[vl_matches7, vl_scores7] = vl_ubcmatch(desc7, desc8, 2.5);
+[vl_matches1, vl_scores1] = vl_ubcmatch(desc1, desc2, 1.5);
+[vl_matches2, vl_scores2] = vl_ubcmatch(desc2, desc3, 1.5);
+[vl_matches3, vl_scores3] = vl_ubcmatch(desc3, desc4, 1.5);
+[vl_matches4, vl_scores4] = vl_ubcmatch(desc4, desc5, 1.5);
+[vl_matches5, vl_scores5] = vl_ubcmatch(desc5, desc6, 1.5);
+[vl_matches6, vl_scores6] = vl_ubcmatch(desc6, desc7, 1.5);
+[vl_matches7, vl_scores7] = vl_ubcmatch(desc7, desc8, 1.5);
+%scores = squared euclidean distance - top k = min k scores
 
+%%Sort the matches according to score
+for l=1:size(img,3)-1
+    eval(sprintf('c_matches = vl_matches%d;', k));
+    eval(sprintf('c_scores = vl_scores%d;', k));
+    sorted = [c_scores',c_matches'];
+    sorted = sortrows(sorted);
+    sorted_scores = sorted(:,1)';
+    sorted_matches = sorted(:,2:3);
+    eval(sprintf('vl_scores%d = sorted_scores;', k));
+    eval(sprintf('vl_matches%d = sorted_matches;', k));
+end
 
 %% Compute the homographies between adjacent image components 
 % compute via eigendecomposition
@@ -70,13 +82,15 @@ for k=1:size(img,3)-1
 
     % Number of Iterations
     PS = 0.99;
-    pkS = 0.17^4;
+    pkS = 0.15^4;
+    %pkS = 0.20^4;
     S = round(log(1-PS)/log(1-pkS));
 
     % Inlier threshold (euclidean distance between tranformed point and actual
     % match x,y
     %T = 100;
-    T = [100,400,300,400,200,300,100];
+    %T = [100,400,300,400,200,300,100];
+    T = [100,400,350,400,200,300,100];
     
     num_matches = size(vl_matches,2);
 
@@ -205,9 +219,6 @@ XA = imwarp(imgA,tform)';
 figure; imagesc(XA);axis image; colormap gray;hold on
 title('RANSAC Transform');
 
-figure; imagesc(img(:,:,1));axis image; colormap gray;hold on
-title('imgA');
-
 %% Plot transformed imgA points onto imgB, should do for 1-7 plotting over 2-8
 match1 = vl_matches(:,pmatches(1,1));
 match2 = vl_matches(:,pmatches(1,2));
@@ -227,8 +238,27 @@ figure; imagesc(img(:,:,2));axis image; colormap gray;hold on
 plot(pt1(1),pt1(2),'r.','MarkerSize',20)
 plot(pt2(1),pt2(2),'b.','MarkerSize',20)
 plot(pt3(1),pt3(2),'g.','MarkerSize',20)
-plot(pt4(1),pt4(2),'w.','MarkerSize',20)
+plot(pt4(1),pt4(2),'r.','MarkerSize',20)
 title('imgB');
+
+figure; imagesc(img(:,:,1));axis image; colormap gray;hold on
+plot(xy1(1),xy1(2),'r.','MarkerSize',20)
+plot(xy2(1),xy2(2),'b.','MarkerSize',20)
+plot(xy3(1),xy3(2),'g.','MarkerSize',20)
+plot(xy4(1),xy4(2),'r.','MarkerSize',20)
+title('imgA');
+
+figure; imagesc(img(:,:,2)); axis image; colormap gray;
+title('imgA');
+[keypointsA,descA] = vl_sift(img(:,:,2));
+perm = randperm(size(keypointsA,2)) ;
+sel = perm(1:100) ;
+h1 = vl_plotframe(keypointsA(:,sel)) ;
+h2 = vl_plotframe(keypointsA(:,sel)) ;
+set(h1,'color','k','linewidth',3) ;
+set(h2,'color','y','linewidth',2) ;
+h3 = vl_plotsiftdescriptor(descA(:,sel),keypointsA(:,sel)) ;
+set(h3,'color','g') ;
 
 
 % %% Visualize the best fit we found, transform imgB -> imgA
