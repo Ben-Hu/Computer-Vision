@@ -9,6 +9,9 @@ img = cat(3,img,single(imread('hotel/hotel-04.png'))/255);
 img = cat(3,img,single(imread('hotel/hotel-05.png'))/255);
 img = cat(3,img,single(imread('hotel/hotel-06.png'))/255);
 img = cat(3,img,single(imread('hotel/hotel-07.png'))/255);
+for q=1:size(img,3)
+    img(:,:,q) = conv2(img(:,:,q),fspecial('Gaussian',[25 25],0.5),'same');
+end
 
 %some base level smoothing
 % imgA = conv2(imgA,fspecial('Gaussian',[25 25],0.5),'same');
@@ -50,13 +53,13 @@ img = cat(3,img,single(imread('hotel/hotel-07.png'))/255);
 
 homographies = zeros(3,3,size(img,3)-1);
 
-for i=1:size(img,3)-1
+for k=1:size(img,3)-1
    
     %Workaround for dynamic variables in matlab
-    eval(sprintf('vl_matches = vl_matches%d;', i));
-    eval(sprintf('vl_scores = vl_scores%d;', i));
-    eval(sprintf('keypointsA = keypoints%d;',i));
-    eval(sprintf('keypointsB = keypoints%d;',i+1));
+    eval(sprintf('vl_matches = vl_matches%d;', k));
+    eval(sprintf('vl_scores = vl_scores%d;', k));
+    eval(sprintf('keypointsA = keypoints%d;',k));
+    eval(sprintf('keypointsB = keypoints%d;',k+1));
        
     % RANSAC 
 
@@ -67,18 +70,16 @@ for i=1:size(img,3)-1
 
     % Inlier threshold (euclidean distance between tranformed point and actual
     % match x,y
-    T = 1.5;
+    T = 300;
 
     num_matches = size(vl_matches,2);
 
     % debuggina and best fits
     max_inliers = 0;
-    best_am = [];
+    best_hm = [];
     best_matches = [];
     min_dist = 9999;
     max_dist = 0;
-    S = 1;
-    
     
     for i=1:S
         % Pick 4 random matches
@@ -128,10 +129,13 @@ for i=1:size(img,3)-1
 
         %h^ = eigenvector w/ smallest eigenvalue of A^T * A
         At = A' * A;
-        [V,D] = eig(At);
-       
-
-        hm = eye(3,3);
+        [eigvec,eigval] = eig(At);
+        eigval = sum(eigval,1);
+        [min_eigval,min_eigval_ind]= min(eigval);
+        %eigenvector corresponding to the minimum eigenvalue 1x9
+        min_eigvec = eigvec(:,min_eigval_ind);
+        
+        hm = reshape(min_eigvec,3,3)';
 
         %Find number of inliers with this calculated transformation
         %Keep track of best transform and matches so far
@@ -153,17 +157,17 @@ for i=1:size(img,3)-1
             %for homographies, need to normalize the result of X_pnt
             %dividing x,y by a -- X_pnt(3)
             X_pnt = round(hm * [A_x;A_y;1]);
-            X_pnt(1) = X_pnt(1)/X_pnt(3);
-            X_pnt(2) = X_pnt(2)/X_pnt(3);
-            X_pnt = [X_pnt(1);X_pnt(2)];
-            X = [B_x,B_y;reshape(X_pnt,1,[])];
+            %X_pnt(1) = X_pnt(1)/X_pnt(3);
+            %X_pnt(2) = X_pnt(2)/X_pnt(3);
+            X_pnt = [X_pnt(1),X_pnt(2)];
+            X = [B_x,B_y;X_pnt];
             dist = pdist(X, 'euclidean');
 
             % For purposes of tuning T
             if dist < min_dist
                 min_dist = dist;
             end
-            if dist > max_dist & max_dist ~= inf
+            if dist > max_dist && max_dist ~= inf
                 max_dist = dist;
             end
 
@@ -184,11 +188,21 @@ for i=1:size(img,3)-1
     end
     
     % Keep the best homography for this image pair, i/i+1
-    homographies(:,:,i) = best_hm;
+    homographies(:,:,k) = best_hm;
 
 end
 
 
+imgA = img(:,:,2)';
+tform = projective2d(homographies(:,:,2)');
+XA = imwarp(imgA,tform)';
+figure; imagesc(XA);axis image; colormap gray;hold on
+title('RANSAC Transform');
+
+figure; imagesc(img(:,:,1));axis image; colormap gray;hold on
+title('imgA');
+figure; imagesc(img(:,:,2));axis image; colormap gray;hold on
+title('imgB');
 
 
 % %% Visualize the best fit we found, transform imgB -> imgA
