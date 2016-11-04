@@ -111,8 +111,7 @@ imgA = img(:,:,2)';
 tform = projective2d(homographies(:,:,2)');
 XA = imwarp(imgA,tform)';
 figure; imagesc(XA);axis image; colormap gray;hold on
-title('RANSAC Transform');
-
+title('Transformed imgA');
 
 %% Plot transformed imgA points onto imgB, should do for 1-7 plotting over 2-8
 p = 1;
