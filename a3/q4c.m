@@ -167,8 +167,8 @@ end
 %make sure there's enough space
 %accumulate transforms to / from center
 %center is XF4/img(:,:,4)
-panoimg = zeros(1000,10000);
-XF8 = imadjust(img(:,:,8),[0.2 0.8],[]);
+panoimg = zeros(1000,5000);
+XF8 = imadjust(img(:,:,8));
 yoffset = 200;
 xoffset = 0;
 panoimg(1+yoffset:size(XF8,1)+yoffset,1+xoffset:size(XF8,2)+xoffset) = XF8; %xoffset=size(XF8,2);
@@ -188,7 +188,6 @@ xoffset = abs(x8(1)+xoffset - x7(1));
 yoffset = abs(x8(2)+yoffset - x7(2));
 panoimg(1+yoffset:size(XF7,1)+yoffset,1+xoffset:size(XF7,2)+xoffset) = XF7; %xoffset=xoffset+size(XF7,2);
 
-
 top_pnt6 = keypoints6(:,vl_matches6(1,1));
 top_pnt7 = keypoints7(:,vl_matches6(2,1));
 x6 = top_pnt6;
@@ -198,7 +197,6 @@ yoffset = abs(x7(2)+yoffset - x6(2))
 tform = projective2d(homographies(:,:,7)');
 XF6 = imwarp(XF6',tform)';
 panoimg(1+yoffset:size(XF6,1)+yoffset,1+xoffset:size(XF6,2)+xoffset) = XF6; %xoffset=xoffset+size(XF6,2);
-
 
 top_pnt5 = keypoints5(:,vl_matches5(1,1));
 top_pnt6 = keypoints6(:,vl_matches5(2,1));
@@ -210,30 +208,48 @@ tform = projective2d(homographies(:,:,6)');
 XF5 = imwarp(XF5',tform)';
 panoimg(1+yoffset:size(XF5,1)+yoffset,1+xoffset:size(XF5,2)+xoffset) = XF5; %xoffset=xoffset+size(XF5,2);
 
-
 top_pnt4 = keypoints4(:,vl_matches4(1,1));
 top_pnt5 = keypoints5(:,vl_matches4(2,1));
 x4 = top_pnt4;
 x5 = top_pnt5;
-xoffset = abs(x6(1)+xoffset - x5(1));
-yoffset = abs(x6(2)+yoffset - x5(2));
+xoffset = abs(x5(1)+xoffset - x4(1));
+yoffset = abs(x5(2)+yoffset - x4(2));
 tform = projective2d(homographies(:,:,5)');
 XF4 = imwarp(XF4',tform)';
 panoimg(1+yoffset:size(XF4,1)+yoffset,1+xoffset:size(XF4,2)+xoffset) = XF4; %xoffset=xoffset+size(XF4,2);
+
+% It gets really messy around here, the center image, for some reason :(
+top_pnt3 = keypoints3(:,vl_matches3(1,1));
+top_pnt4 = keypoints4(:,vl_matches3(2,1));
+x3 = top_pnt3;
+x4 = top_pnt4;
+xoffset = abs(x4(1)+xoffset - x3(1)-75);
+yoffset = abs(x4(2)+yoffset - x3(2)+125);
+tform = projective2d(homographies(:,:,4)');
+XF3 = imwarp(XF3',tform)';
+panoimg(1+yoffset:size(XF3,1)+yoffset,1+xoffset:size(XF3,2)+xoffset) = XF3; %xoffset=xoffset+size(XF3,2);
 figure;imagesc(panoimg);axis image;colormap gray;
 
-% 
-% tform = projective2d(homographies(:,:,4)');
-% XF3 = imwarp(XF3',tform)';
-% panoimg(1+yoffset:size(XF3,1)+yoffset,1+xoffset:size(XF3,2)+xoffset) = XF3; xoffset=xoffset+size(XF3,2);
-% 
-% tform = projective2d(homographies(:,:,3)');
-% XF2 = imwarp(XF2',tform)';
-% panoimg(1+yoffset:size(XF2,1)+yoffset,1+xoffset:size(XF2,2)+xoffset) = XF2; xoffset=xoffset+size(XF2,2);
-% 
-% tform = projective2d(homographies(:,:,2)');
-% XF1 = imwarp(XF1',tform)';
-% panoimg(1+yoffset:size(XF1,1)+yoffset,1+xoffset:size(XF1,2)+xoffset) = XF1; xoffset=xoffset+size(XF1,2);
-% figure;imagesc(panoimg);axis image;colormap gray;
+top_pnt2 = keypoints2(:,vl_matches2(1,1));
+top_pnt3 = keypoints3(:,vl_matches2(2,1));
+x2 = top_pnt2;
+x3 = top_pnt3;
+xoffset = abs(x3(1)+xoffset - x2(1));
+yoffset = abs(x3(2)+yoffset - x2(2));
+tform = projective2d(homographies(:,:,3)');
+XF2 = imwarp(XF2',tform)';
+panoimg(1+yoffset:size(XF2,1)+yoffset,1+xoffset:size(XF2,2)+xoffset) = XF2; %xoffset=xoffset+size(XF2,2);
+
+
+top_pnt1 = keypoints1(:,vl_matches1(1,1));
+top_pnt2 = keypoints2(:,vl_matches1(2,1));
+x1 = top_pnt1;
+x2 = top_pnt2;
+xoffset = abs(x2(1)+xoffset - x1(1));
+yoffset = abs(x2(2)+yoffset - x1(2)-75);
+tform = projective2d(homographies(:,:,2)');
+XF1 = imwarp(XF1',tform)';
+panoimg(1+yoffset:size(XF1,1)+yoffset,1+xoffset:size(XF1,2)+xoffset) = XF1; %xoffset=xoffset+size(XF1,2);
+figure;imagesc(panoimg);axis image;colormap gray;
 
 
