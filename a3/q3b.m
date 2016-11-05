@@ -165,32 +165,4 @@ title('RANSAC Transform');
 figure; imagesc(best_img);axis image; colormap gray;hold on
 title('Best Img Permutation');
 
-% %Plot the trasnformation as parallelogram over the image
-% bl_corner = round(best_am*[0;0;1]);
-% br_corner = round(best_am*[0;387;1]);
-% tl_corner = round(best_am*[395;0;1]);
-% tr_corner = round(best_am*[395;387;1]);
-% 
-% figure; imagesc(imgB);axis image; colormap gray;hold on
-% line([bl_corner(2),tl_corner(2)],[bl_corner(1),tl_corner(1)]);
-% line([bl_corner(2),br_corner(2)],[bl_corner(1),br_corner(1)]);
-% line([tr_corner(2),br_corner(2)],[tr_corner(1),br_corner(1)]);
-% line([tr_corner(2),tl_corner(2)],[tr_corner(1),tl_corner(1)]);
-% title('Transform Overlay');
-
-% %Reference transform from Moore-Penrose lease squares from by A2 code.
-% t_am = [0.0597929162403003,1.04042462070958,511.473935250196;,-1.04304742306299,-0.132837054877354,1484.35163183366]
-% XAt = zeros(size(imgB,1),size(imgB,2));
-% for i=1:size(imgA,1)
-%     for j=1:size(imgA,2)
-%         res = t_am * [i;j;1];
-%         new_x = max(1,round(res(1)));
-%         new_y = max(1,round(res(2)));
-%         XAt(new_x,new_y) = imgA(i,j);
-%     end
-% end
-% figure; imagesc(XAt);axis image; colormap gray;hold on
-% title('RANSACt');
-
-
 
