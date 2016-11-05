@@ -219,6 +219,9 @@ XF4 = imwarp(XF4',tform)';
 panoimg(1+yoffset:size(XF4,1)+yoffset,1+xoffset:size(XF4,2)+xoffset) = XF4; %xoffset=xoffset+size(XF4,2);
 
 % It gets really messy around here, the center image, for some reason :(
+% needed some manual adjustment to x and y coordinates to look okay,
+% otherwise things stopped lining up - couldn't figure out why since before
+% this image everything went well.
 top_pnt3 = keypoints3(:,vl_matches3(1,1));
 top_pnt4 = keypoints4(:,vl_matches3(2,1));
 x3 = top_pnt3;
