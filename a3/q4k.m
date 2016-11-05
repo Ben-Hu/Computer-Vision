@@ -74,7 +74,8 @@ for k=1:size(img,3)-1
 
     % ***USE TOP k ordered by squared euclidean disnace
     % Inconsistent and poor results with RANSAC even with higher S
-    % iteration values, getting really consistent and good results with 
+    % iteration values many different threshold values/other parameters,
+    % getting really consistent and decent results with 
     % top k estimation
 
     top_k = 8;
@@ -106,13 +107,6 @@ for k=1:size(img,3)-1
     homographies(:,:,k) = best_hm;
 end
 
-
-imgA = img(:,:,2)';
-tform = projective2d(homographies(:,:,2)');
-XA = imwarp(imgA,tform)';
-figure; imagesc(XA);axis image; colormap gray;hold on
-title('Transformed imgA');
-
 %% Plot transformed imgA points onto imgB, should do for 1-7 plotting over 2-8
 %p = 1; 
 for p=1:size(img,3)-1
@@ -121,43 +115,33 @@ for p=1:size(img,3)-1
     eval(sprintf('keypointsAp = keypoints%d;',p));
     eval(sprintf('keypointsBp = keypoints%d;',p+1));
 
-    xy = zeros(2,top_k);
+    xyA = zeros(2,top_k);
+    xyB = zeros(2,top_k);
     matches = zeros(2,top_k);
     pnts = zeros(3,top_k);
     for q=1:top_k 
         matches(:,q) = vl_matchesp(:,q);
-        xy(:,q) = [keypointsAp(2,matches(2,q)),keypointsAp(1,matches(1,q))];
-        pnts(:,q) = homographies(:,:,p) * [xy(:,q);1];
+        xyA(:,q) = [keypointsAp(2,matches(1,q)),keypointsAp(1,matches(1,q))];
+        xyB(:,q) = [keypointsBp(2,matches(2,q)),keypointsBp(1,matches(2,q))];
+        pnts(:,q) = homographies(:,:,p) * [xyA(:,q);1];
         pnts(1,q) = max(1,pnts(1,q)/pnts(3,q));
         pnts(2,q) = max(1,pnts(2,q)/pnts(3,q));
     end
 
     figure; imagesc(img(:,:,p));axis image; colormap gray;hold on
     for q=1:top_k
-        plot(xy(2,q),xy(1,q),'r.','MarkerSize',20);
+        plot(xyA(2,q),xyA(1,q),'r.','MarkerSize',20);
     end
     hold off;
     title('imgA(top k points)');
 
     figure; imagesc(img(:,:,p+1));axis image; colormap gray;hold on
     for q=1:top_k
+        %%You won't be able to see the computed points in red since the
+        %%points in green will be pretty much on top of them
         plot(pnts(2,q),pnts(1,q),'r.','MarkerSize',20);
+        plot(xyB(2,q),xyB(1,q),'g.','MarkerSize',20);
     end
     hold off;
     title('imgB(xformed points)');
 end
-
-% figure; imagesc(img(:,:,2)); axis image; colormap gray;
-% title('imgA');
-% [keypointsA,descA] = vl_sift(img(:,:,2));
-% perm = randperm(size(keypointsA,2)) ;
-% sel = perm(1:100) ;
-% h1 = vl_plotframe(keypointsA(:,sel)) ;
-% h2 = vl_plotframe(keypointsA(:,sel)) ;
-% set(h1,'color','k','linewidth',3) ;
-% set(h2,'color','y','linewidth',2) ;
-% h3 = vl_plotsiftdescriptor(descA(:,sel),keypointsA(:,sel)) ;
-% set(h3,'color','g') ;
-
-
-
