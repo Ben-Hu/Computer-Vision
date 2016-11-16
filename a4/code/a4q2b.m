@@ -29,13 +29,13 @@
 
 % need to adjust thresholds for above, model.thresh too low it seems?
 
-data = getData([], [], 'detector-person');
+data = getData([], [], 'detector-car');
 model = data.model;
 col = 'r';
 
 %Update this for each test image, need to do left and right?
 %ids to check are ["004945";"004964";"005002"]
-imdata = getData('005002', 'test', 'right');
+imdata = getData('004945', 'test', 'right');
 im = imdata.im;
 f = 1.5;
 imr = imresize(im,f); % if we resize, it works better for small objects
@@ -66,6 +66,5 @@ ds = ds(top, :);
 %e.g. 
 %save(fullfile(DATA_DIR, 'test', 'results', '005002_person_left.mat'), 'ds');
 %save(fullfile(DATA_DIR, 'test', 'results', '005002_person_right.mat'), 'ds');
-
-
+%etc.
 

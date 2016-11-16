@@ -37,7 +37,7 @@ for i=1:size(ids,1)
     eval(sprintf('img%dRightBicycleRes = getData(ids(%d), [], ''result_bicycle_right'');',i,i));
     eval(sprintf('img%dRightBicycleRes = img%dRightBicycleRes.ds;',i,i));
 end
-% 
+
 % figure; imagesc(img1Left);axis image;
 % figure; imagesc(img2Left);axis image;
 % figure; imagesc(img3Left);axis image;
@@ -46,38 +46,34 @@ end
 % figure; imagesc(img2Right);axis image;
 % figure; imagesc(img3Right);axis image;
 
-
-
 %% Plot the boxes on the images
 % IMG1LEFT
-plotBoxes(img1Left, img1LeftCarRes, img1LeftPersonRes, img1LeftBicycleRes);
+plotBoxes(img1Left, img1LeftCarRes, img1LeftPersonRes, img1LeftBicycleRes,10,10,10);
 
 % IMG2LEFT
-plotBoxes(img2Left, img2LeftCarRes, img2LeftPersonRes, img2LeftBicycleRes);
+plotBoxes(img2Left, img2LeftCarRes, img2LeftPersonRes, img2LeftBicycleRes,10,10,10);
 
 % IMG3LEFT
-plotBoxes(img3Left, img3LeftCarRes, img3LeftPersonRes, img3LeftBicycleRes);
+plotBoxes(img3Left, img3LeftCarRes, img3LeftPersonRes, img3LeftBicycleRes,10,10,10);
 
 
 % IMG1RIGHT
-plotBoxes(img1Right, img1RightCarRes, img1RightPersonRes, img1RightBicycleRes);
+plotBoxes(img1Right, img1RightCarRes, img1RightPersonRes, img1RightBicycleRes,10,10,10);
 
 % IMG2RIGHT
-plotBoxes(img2Right, img2RightCarRes, img2RightPersonRes, img2RightBicycleRes);
+plotBoxes(img2Right, img2RightCarRes, img2RightPersonRes, img2RightBicycleRes,10,10,10);
 
 % IMG3RIGHT
-plotBoxes(img3Right, img3RightCarRes, img3RightPersonRes, img3RightBicycleRes);
+plotBoxes(img3Right, img3RightCarRes, img3RightPersonRes, img3RightBicycleRes,10,10,10);
 
 %% Plot all the bounding boxes for cars, persons, and bicycles on the img
-function plotBoxes(img,carRes,personRes,bicycleRes)
-    % Results (ds) format
-    % The bounding box is represented with two corner points, 
-    % the top left corner (xleft,ytop) and the bottom right corner (xright,yright).
-    % score is the strength of the detection
-    % ds = [xleft,ytop,xright,ybottom,ID,score;...] 
-    clean = 5;
+function plotBoxes(img,carRes,personRes,bicycleRes,topC,topP,topB)
+    %top* params are for limiting the plots to the top 'top*' detections
+    %should have thresholded more in part b since ther are many false
+    %detections
+    fontsize = 10;
     figure;imagesc(img);axis image;hold on;
-    for i=1:min(clean,size(carRes,1))
+    for i=1:min(topC,size(carRes,1))
         bounds = carRes(i,1:4);
         xl = bounds(1);
         yt = bounds(2);
@@ -85,9 +81,10 @@ function plotBoxes(img,carRes,personRes,bicycleRes)
         yb = bounds(4);
         xp = [xl,xr,xr,xl,xl];
         yp = [yb,yb,yt,yt,yb];
-        plot(xp,yp,'r','LineWidth',2); 
+        plot(xp,yp,'r','LineWidth',2);
+        text(xl,yt+fontsize/2,'Car','Color','r','FontSize',fontsize,'FontWeight','bold');
     end
-    for i=1:min(clean,size(personRes,1))
+    for i=1:min(topP,size(personRes,1))
         bounds = personRes(i,1:4);
         xl = bounds(1);
         yt = bounds(2);
@@ -96,8 +93,9 @@ function plotBoxes(img,carRes,personRes,bicycleRes)
         xp = [xl,xr,xr,xl,xl];
         yp = [yb,yb,yt,yt,yb];
         plot(xp,yp,'b','LineWidth',2); 
+        text(xl,yt+fontsize/2,'Person','Color','b','FontSize',fontsize,'FontWeight','bold');
     end
-    for i=1:min(clean,size(bicycleRes,1))
+    for i=1:min(topB,size(bicycleRes,1))
         bounds = bicycleRes(i,1:4);
         xl = bounds(1);
         yt = bounds(2);
@@ -106,6 +104,7 @@ function plotBoxes(img,carRes,personRes,bicycleRes)
         xp = [xl,xr,xr,xl,xl];
         yp = [yb,yb,yt,yt,yb];
         plot(xp,yp,'c','LineWidth',2); 
+        text(xl,yt+fontsize/2,'Bike','Color','c','FontSize',fontsize,'FontWeight','bold');
     end
     hold off;
 end

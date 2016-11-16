@@ -105,11 +105,13 @@ function [cmC,cmP,cmB]=plotBoxes(img,carRes,personRes,bicycleRes,topC,topP,topB,
         
         %get depth at the center of the bounding box, need to add some
         %offset to this depth
-        xc = round(xr - xl);
-        yc = round(yb - yt);
+        xc = round((xr + xl)/2);
+        yc = round((yb + yt)/2);
+        dt = round(depthMap(yc,xc));
         cmC(i,:) = [xc,yc,depthMap(yc,xc)];
         plot(xp,yp,'r','LineWidth',2);
-        text(xl,yt+fontsize/2,'Car','Color','r','FontSize',fontsize,'FontWeight','bold');
+        text(xl,yt+fontsize/2, sprintf('Car%d',i) ,'Color','r','FontSize',fontsize,'FontWeight','bold');
+        text(xc,yc, sprintf('c:%d d:%d',i,dt),'Color','m','FontSize',fontsize,'FontWeight','bold');
     end
     for i=1:min(topP,size(personRes,1))
         bounds = personRes(i,1:4);
@@ -119,11 +121,13 @@ function [cmC,cmP,cmB]=plotBoxes(img,carRes,personRes,bicycleRes,topC,topP,topB,
         yb = bounds(4);
         xp = [xl,xr,xr,xl,xl];
         yp = [yb,yb,yt,yt,yb];
-        xc = round(xr - xl);
-        yc = round(yb - yt);
+        xc = round((xr + xl)/2);
+        yc = round((yb + yt)/2);
+        dt = round(depthMap(yc,xc));
         cmP(i,:) = [xc,yc,depthMap(yc,xc)];
         plot(xp,yp,'b','LineWidth',2); 
-        text(xl,yt+fontsize/2,'Person','Color','b','FontSize',fontsize,'FontWeight','bold');
+        text(xl,yt+fontsize/2,sprintf('Person_%d',i),'Color','b','FontSize',fontsize,'FontWeight','bold');
+        text(xc,yc,sprintf('p:%d d:%d',i,dt),'Color','g','FontSize',fontsize,'FontWeight','bold');
     end
     for i=1:min(topB,size(bicycleRes,1))
         bounds = bicycleRes(i,1:4);
@@ -133,11 +137,18 @@ function [cmC,cmP,cmB]=plotBoxes(img,carRes,personRes,bicycleRes,topC,topP,topB,
         yb = bounds(4);
         xp = [xl,xr,xr,xl,xl];
         yp = [yb,yb,yt,yt,yb];
-        xc = round(xr - xl);
-        yc = round(yb - yt);
+        xc = round((xr + xl)/2);
+        yc = round((yb + yt)/2);
+        dt = round(depthMap(yc,xc));
         cmB(i,:) = [xc,yc,depthMap(yc,xc)];
         plot(xp,yp,'c','LineWidth',2); 
-        text(xl,yt+fontsize/2,'Bike','Color','c','FontSize',fontsize,'FontWeight','bold');
+        text(xl,yt+fontsize/2,sprintf('Bike_%d',i),'Color','c','FontSize',fontsize,'FontWeight','bold');
+        text(xc,yc, sprintf('b:%d d:%d',i,dt),'Color','y','FontSize',fontsize,'FontWeight','bold');
     end
     hold off;
 end
+
+% 
+% C = [0 255];
+% figure; imagesc(depthMap1,C); axis image; title('depth 1');
+% hp = impixelinfo;
